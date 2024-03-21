@@ -1,5 +1,6 @@
 import speech_recognition
 import pyttsx3
+from assistant import Assistant
 
 ENGINE = pyttsx3.init()
 
@@ -21,13 +22,22 @@ def audio_to_text(audio):
 def speak(text):
     ENGINE.say(text) # add to queue
     ENGINE.runAndWait() # go through queue
+
+assistant = Assistant("config/api_keys.json")
     
 while True:
     user_sentence = audio_to_text(listen())
     print(user_sentence)
-    
+
+    if user_sentence == "":
+        continue
+
     if user_sentence == "goodbye":
         speak("See ya later!")
         quit()
-    else: 
-        speak(user_sentence)
+
+    prompt = user_sentence
+    assistant_response = assistant.get_response(prompt)
+    print(f"Responding: {assistant_response}")
+
+    speak(assistant_response)
