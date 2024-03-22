@@ -1,8 +1,10 @@
 from openai import OpenAI
 import json
+import os
+import sys
 
 class Assistant():
-    def __init__(self, keys_file):
+    def __init__(self, keys_file, skill_objects):
         self.conversation_transcript = [
             {
                 "role": "system",
@@ -16,6 +18,8 @@ class Assistant():
         
         self.client = OpenAI(api_key=api_keys["openai"])
 
+        self.known_skills = self.reload_skills(skill_objects)
+
     def add_msg_to_transcript(self, role, content):
             msg_dict = {"role": role, "content": content}
             self.conversation_transcript.append(msg_dict)
@@ -23,17 +27,37 @@ class Assistant():
     def get_openai_response(self):
             response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=self.conversation_transcript 
+                messages=self.conversation_transcript,
+                # functions: this parameter is a list 
+                functions=self.get_skill_metadata(),
+                function_call="auto"
             )
             return response
 
     def get_response(self, prompt):      
         self.add_msg_to_transcript("user", prompt)
-        response = self.get_openai_response()
 
-        assistant_msg = response.choices[0].message.content
+        while True:
+            response = self.get_openai_response()
 
-        self.add_msg_to_transcript("assistant", assistant_msg)
+            assistant_msg = response.choices[0].message
+            msg_contents = assistant_msg.content
 
-        return assistant_msg
+            if not assistant_msg.function_call:
+                self.conversation_transcript.append(msg_contents)
+                return msg_contents
+        
+    def reload_skills(self, skill_objects):
+        known_skills = {}
+        for skill in skill_objects:
+            known_skills[skill.name] = skill
+
+        return known_skills
+    
+    def get_skill_metadata(self):
+        skills_metadata = []
+        for skill in self.known_skills.values():
+            skills_metadata.append(skill.metadata)
+
+        return skills_metadata
         
