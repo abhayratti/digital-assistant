@@ -44,8 +44,7 @@ class {name of the new skill} (BasicSkill):
     
     def perform(self, {parameters}):
         {skill functionality}
-        return {string that describes the result of the function}
-"""
+        return {string that describes the result of the function}"""
                     }
                 },
                 "required": ["skill_name", "python_implementation"]
