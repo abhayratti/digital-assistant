@@ -1,17 +1,21 @@
 from skills.basic_skill import BasicSkill
-import pytwhatkit
+import pywhatkit
 
 class PlayYoutubeVideo(BasicSkill):
-    def __init__(self, name, metadata):
+    def __init__(self):
         self.name = "PlayYoutubeVideo"
         self.metadata = {
             "name": self.name,
             "description": "Plays a Youtube Video based on its titles",
             "parameters": {
-                "video_title": {
+                "type": "object",
+                "properties": {
+                    "video_title": {
                     "type": "string",
                     "description": "Name of the Youtube video"
+                    }
                 }
+                
             },
             "required": ["video_title"]
         }
@@ -19,7 +23,7 @@ class PlayYoutubeVideo(BasicSkill):
 
     def perform(self, video_title):
         try:
-            pytwhatkit.playonyt(video_title)
+            pywhatkit.playonyt(video_title)
             return f"Successfully Played {video_title}"
         except:
             return f"Can't play {video_title}"

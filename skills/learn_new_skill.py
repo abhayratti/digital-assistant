@@ -1,7 +1,7 @@
 from skills.basic_skill import BasicSkill
 
 class LearnNewSkill(BasicSkill):
-    def __init__(self, name, metadata):
+    def __init__(self):
         self.name = "LearnNewSkill"
         self.metadata = {
             "name": self.name,

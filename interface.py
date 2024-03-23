@@ -1,8 +1,41 @@
 import speech_recognition
 import pyttsx3
+import sys
+import os 
+import importlib
+import inspect
 from assistant import Assistant
+from skills.basic_skill import BasicSkill
 
 ENGINE = pyttsx3.init()
+
+def load_skills():
+    skill_files = []
+    forbidden_files = ["__init__.py", "basic_skill.py"]
+    for file in os.listdir("./skills"):
+        if not file.endswith(".py"):
+            continue
+        if file in forbidden_files:
+            continue
+
+        skill_files.append(file)
+
+    skill_module_names = []
+    for file in skill_files:
+        skill_module_names.append(file[:-3])
+
+    declared_skills = []
+    for skill in skill_module_names:
+        module = importlib.import_module('skills.' + skill)
+        for name, member in inspect.getmembers(module):
+            if not (inspect.isclass(member) and issubclass(member, BasicSkill)):
+                continue
+            if member is BasicSkill:
+                continue
+
+            declared_skills.append(member())
+    
+    return declared_skills
 
 def listen():
     recognizer = speech_recognition.Recognizer()
@@ -23,9 +56,14 @@ def speak(text):
     ENGINE.say(text) # add to queue
     ENGINE.runAndWait() # go through queue
 
-assistant = Assistant("config/api_keys.json")
+declared_skills = load_skills()
+assistant = Assistant("config/api_keys.json", declared_skills)
     
+
 while True:
+    declared_skills = load_skills()
+    assistant.reload_skills(declared_skills)
+
     user_sentence = audio_to_text(listen())
     print(user_sentence)
 

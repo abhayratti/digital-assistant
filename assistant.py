@@ -1,7 +1,7 @@
-from openai import OpenAI
 import json
 import os
 import sys
+from openai import OpenAI
 
 class Assistant():
     def __init__(self, keys_file, skill_objects):
@@ -28,8 +28,9 @@ class Assistant():
             response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=self.conversation_transcript,
-                # functions: this parameter is a list 
+                # functions: provide a list of metadata dictionaries with the functions the model can call to assist with the given task 
                 functions=self.get_skill_metadata(),
+                # function_call: "None" - make no function call, "Auto" - the model can automatically call functions, without explicitly being told, to help with response
                 function_call="auto"
             )
             return response
@@ -43,9 +44,33 @@ class Assistant():
             assistant_msg = response.choices[0].message
             msg_contents = assistant_msg.content
 
+            # case where model is explicitly told what skill to use
             if not assistant_msg.function_call:
                 self.conversation_transcript.append(msg_contents)
                 return msg_contents
+            
+            # if model needs to auto use a skill first find the name, then search for it
+            skill_name = assistant_msg.function_call.name
+            skill = self.known_skills.get(skill_name)
+
+            if not skill:
+                 return f"{skill_name} does not exist"
+            
+            skill_parameters = json.loads(assistant_msg.function_call.arguments)
+
+            # perform the skill (result is a string)
+            result = skill.perform(**skill_parameters)
+
+            # once skill performed, model needs context to what happened 
+            self.conversation_transcript.append(
+                 {
+                      "role": "function",
+                      "name": skill_name,
+                      "content": result
+                 }
+            )
+
+            print(f"Performed the {skill_name} skill and got the following response: {result}")
         
     def reload_skills(self, skill_objects):
         known_skills = {}
