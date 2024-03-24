@@ -17,34 +17,37 @@ class LearnNewSkill(BasicSkill):
                     "python_implementation": {
                         "type": "string",
                         "description": """The Python code that is behind the new skill. the code should follow the following template:
-from skills.basic_skill import Basic Skill
-{import any other libraries}
-class {name of the new skill} (BasicSkill):
+[[[
+from skills.basic_skill import BasicSkill
+{import any other libraries. if necessary to access a website, try to use beautiful soup instead of website apis}
+class {name of the new skill}(BasicSkill):
     def __init__(self):
         self.name = {skill name}
         self.metadata = {
-            \"name\": self.name,
-            \"description\": \"{a description of the skill that describes when it should be used and what it does}\",
-            \"parameters\": {
-                \"type\": \"object\",
-                \"properties\": {
-                    \"{parameter 1 name}\": {
-                        \"type\": {parameter type, i.e: string}\",
-                        \"description\": \"{description of what the parameter is used for}\"
+            "name": self.name,
+            "description": "{a description of the skill that describes when it should be used and what it does}",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "{parameter 1 name}": {
+                        "type": "{parameter type, i.e: string}",
+                        "description": "{description of what the parameter is used for}"
                     },
-                    \"{parameter 2 name}\": {
-                        \"type\": {parameter type, i.e: string}\",
-                        \"description\": \"{description of what the parameter is used for}\"
+                    "{parameter 2 name}": {
+                        "type": "{parameter type, i.e: string}",
+                        "description": "{description of what the parameter is used for}"
                     }
                 },
-                \"required\": [\"{name of required parameter}\", \"{name of required parameter}\"]
+                "required": ["{name of required parameter}", "{name of required parameter}"]
             }
         }
         super().__init__(name=self.name, metadata=self.metadata)
-    
+
     def perform(self, {parameters}):
         {skill functionality}
-        return {string that describes the result of the function}"""
+        return {string describing result of function}
+]]]
+"""
                     }
                 },
                 "required": ["skill_name", "python_implementation"]

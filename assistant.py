@@ -26,7 +26,7 @@ class Assistant():
     
     def get_openai_response(self):
             response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4-turbo-preview",
                 messages=self.conversation_transcript,
                 # functions: provide a list of metadata dictionaries with the functions the model can call to assist with the given task 
                 functions=self.get_skill_metadata(),
