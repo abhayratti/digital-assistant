@@ -57,15 +57,24 @@ def speak(text):
     ENGINE.runAndWait() # go through queue
 
 declared_skills = load_skills()
-assistant = Assistant("config/api_keys.json", declared_skills)
     
+communication_medium = input("How would you like to communicate? Text ('t') or speech ('s'): ")
+model = input("Which model would you like to use? gpt3 ('3') or gpt4 ('4'): ")
+
+if model == "4":
+    assistant = Assistant("config/api_keys.json", declared_skills, model="gpt-4-1106-preview")
+else:
+    assistant = Assistant("config/api_keys.json", declared_skills)
 
 while True:
     declared_skills = load_skills()
     assistant.reload_skills(declared_skills)
 
-    user_sentence = audio_to_text(listen())
-    print(user_sentence)
+    if communication_medium == "t":
+        user_sentence = input("You: ")
+    else:
+        user_sentence = audio_to_text(listen())
+        print(user_sentence)
 
     if user_sentence == "":
         continue
@@ -77,5 +86,3 @@ while True:
     prompt = user_sentence
     assistant_response = assistant.get_response(prompt)
     print(f"Responding: {assistant_response}")
-
-    speak(assistant_response)

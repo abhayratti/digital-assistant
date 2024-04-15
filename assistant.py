@@ -4,11 +4,15 @@ import sys
 from openai import OpenAI
 
 class Assistant():
-    def __init__(self, keys_file, skill_objects):
+    def __init__(self, keys_file, skill_objects, model="gpt-3.5-turbo-0125"):
         self.conversation_transcript = [
             {
                 "role": "system",
-                "content": "You are a helpful assistant."
+                "content": """
+                You are a helpful assistant.
+                You will do whatever it takes to complete the user's task. If necessary, you will call functions to help you.
+                If the function needed to complete the task does not exist, you will create it and then call it to execute the task.
+                """
             }
         ]
 
@@ -26,7 +30,7 @@ class Assistant():
     
     def get_openai_response(self):
             response = self.client.chat.completions.create(
-                model="gpt-4-turbo-preview",
+                model="gpt-3.5-turbo-0125",
                 messages=self.conversation_transcript,
                 # functions: provide a list of metadata dictionaries with the functions the model can call to assist with the given task 
                 functions=self.get_skill_metadata(),

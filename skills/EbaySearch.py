@@ -21,7 +21,8 @@ class EbaySearch(BasicSkill):
         }
         super().__init__(name=self.name, metadata=self.metadata)
 
-    def perform(self, query):
+    def perform(self, **kwargs):
+        query = kwargs.get('query', '')  # Default to an empty string if no query provided
         headers = {'User-Agent': 'Mozilla/5.0'}
         url = f"https://www.ebay.com/sch/i.html?_nkw={query}"
         response = requests.get(url, headers=headers)
@@ -30,9 +31,12 @@ class EbaySearch(BasicSkill):
 
         results = []
         for item in items:
-            title = item.find('h3', {'class': 's-item__title'}).text
-            price = item.find('span', {'class': 's-item__price'}).text
-            link = item.find('a', {'class': 's-item__link'})['href']
+            title_element = item.find('h3', {'class': 's-item__title'})
+            title = title_element.text if title_element else "Title not available"
+            price_element = item.find('span', {'class': 's-item__price'})
+            price = price_element.text if price_element else "Price not available"
+            link_element = item.find('a', {'class': 's-item__link'})
+            link = link_element['href'] if link_element else "Link not available"
             results.append(f'{title} - {price} - {link}')
 
         return '\n'.join(results)
