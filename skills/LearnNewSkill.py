@@ -16,10 +16,8 @@ class LearnNewSkill(BasicSkill):
                     },
                     "python_implementation": {
                         "type": "string",
-                        "description": """The Python code that is behind the new skill. the code should follow the following template:
-[[[
-from skills.basic_skill import BasicSkill
-{import any other libraries. if necessary to access a website, try to use beautiful soup instead of website apis}
+                        "description": """The Python code that is behind the new skill. the code should follow the following template:from skills.basic_skill import BasicSkill
+{import any other libraries. use beautiful soup instead of website apis. avoid using any apis that require an api key}
 class {name of the new skill}(BasicSkill):
     def __init__(self):
         self.name = {skill name}
@@ -46,7 +44,6 @@ class {name of the new skill}(BasicSkill):
     def perform(self, {parameters}):
         {skill functionality}
         return {string describing result of function}
-]]]
 """
                     }
                 },
